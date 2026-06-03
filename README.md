@@ -19,11 +19,15 @@ just an honest answer to *"when did we last do that?"*
 
 ## Run with Docker
 
-A prebuilt image is published to GitHub Container Registry:
-[`ghcr.io/markmork/whatwhen:latest`](https://ghcr.io/markmork/whatwhen).
+Docker Compose
 
 ```bash
-docker compose up -d
+services:
+  whatwhen:
+    image: ghcr.io/markmork/whatwhen:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
 ```
 
 Then open <http://localhost:8080>. Data is stored in the named volume `whatwhen-data`
@@ -37,30 +41,12 @@ To update to the latest image: `docker compose pull && docker compose up -d`.
 docker run -d --name whatwhen -p 8080:8080 -v whatwhen-data:/data ghcr.io/markmork/whatwhen:latest
 ```
 
-### Build from source instead
-
-```bash
-docker build -t whatwhen .
-docker run -d --name whatwhen -p 8080:8080 -v whatwhen-data:/data whatwhen
-```
-
 ## Configuration
 
 | Variable    | Default                | Description                          |
 |-------------|------------------------|--------------------------------------|
 | `PORT`      | `8080`                 | Port the server listens on.          |
 | `DATA_FILE` | `/data/whatwhen.json`  | Path to the JSON data file.          |
-
-## Local development
-
-Requires Go 1.22+.
-
-```bash
-DATA_FILE=./whatwhen.json go run .
-```
-
-Open <http://localhost:8080>. The frontend (`web/`) is embedded into the binary at build time,
-so the compiled binary is fully self-contained.
 
 ## How it works
 
