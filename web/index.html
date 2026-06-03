@@ -6,13 +6,25 @@
   <meta name="theme-color" content="#4f46e5" />
   <title>WhatWhen</title>
   <link rel="stylesheet" href="style.css" />
+  <script>
+    // Apply a saved theme before first paint to avoid a flash.
+    (function () {
+      var t = localStorage.getItem("whatwhen-theme");
+      if (t) document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
 </head>
 <body>
   <header class="app-header">
-    <button id="lock-toggle" class="lock-toggle" type="button" aria-pressed="false">
-      <span class="lock-icon" aria-hidden="true">🔒</span>
-      <span class="lock-text">Locked</span>
-    </button>
+    <div class="header-controls">
+      <button id="lock-toggle" class="ctrl-btn lock-toggle" type="button" aria-pressed="false">
+        <span class="lock-icon" aria-hidden="true">🔒</span>
+        <span class="lock-text">Locked</span>
+      </button>
+      <button id="theme-toggle" class="ctrl-btn theme-toggle" type="button" aria-label="Toggle light/dark theme">
+        <span class="theme-icon" aria-hidden="true">🌙</span>
+      </button>
+    </div>
     <h1>What<span>When</span></h1>
     <p class="tagline">What you did &amp; when you last did it</p>
   </header>
