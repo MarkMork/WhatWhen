@@ -13,9 +13,8 @@ just an honest answer to *"when did we last do that?"*
 - **No login** — designed to run locally or behind a reverse proxy (e.g. nginx proxy manager).
 - **Always counting** — timers are anchored to a stored timestamp, so they stay correct whether
   or not the page (or server) was running.
-- **Designed for local hosting** — No auth, no security. Designed to be hosted locally and not
-  exposed to the Internet
 
+![Alt text](assets/app.gif)
 
 
 ## Run with Docker
