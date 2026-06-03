@@ -1,7 +1,9 @@
 services:
   whatwhen:
-    build: .
-    image: whatwhen
+    image: ghcr.io/markmork/whatwhen:latest
+    # To build from source instead of pulling, comment out the line above and
+    # uncomment the next one:
+    # build: .
     container_name: whatwhen
     restart: unless-stopped
     ports:

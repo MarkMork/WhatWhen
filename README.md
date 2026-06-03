@@ -16,14 +16,25 @@ just an honest answer to *"when did we last do that?"*
 
 ## Run with Docker
 
+A prebuilt image is published to GitHub Container Registry:
+[`ghcr.io/markmork/whatwhen:latest`](https://ghcr.io/markmork/whatwhen).
+
 ```bash
-docker compose up --build -d
+docker compose up -d
 ```
 
 Then open <http://localhost:8080>. Data is stored in the named volume `whatwhen-data`
-(`/data/whatwhen.json` inside the container) and persists across restarts and rebuilds.
+(`/data/whatwhen.json` inside the container) and persists across restarts and image updates.
+
+To update to the latest image: `docker compose pull && docker compose up -d`.
 
 ### Plain Docker (without compose)
+
+```bash
+docker run -d --name whatwhen -p 8080:8080 -v whatwhen-data:/data ghcr.io/markmork/whatwhen:latest
+```
+
+### Build from source instead
 
 ```bash
 docker build -t whatwhen .

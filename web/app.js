@@ -5,6 +5,7 @@ const empty = document.getElementById("empty");
 const addForm = document.getElementById("add-form");
 const addInput = document.getElementById("add-input");
 const lockToggle = document.getElementById("lock-toggle");
+const themeToggle = document.getElementById("theme-toggle");
 
 // When locked (the default), edit/delete and timestamp editing are hidden so the
 // everyday view stays clean. Preference is remembered in the browser.
@@ -21,6 +22,29 @@ lockToggle.addEventListener("click", () => {
   unlocked = !unlocked;
   localStorage.setItem("whatwhen-unlocked", unlocked ? "1" : "0");
   applyLock();
+});
+
+// Theme: follows the OS by default; a saved choice ("light"/"dark") overrides it.
+function effectiveTheme() {
+  const saved = localStorage.getItem("whatwhen-theme");
+  if (saved) return saved;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function applyTheme() {
+  const saved = localStorage.getItem("whatwhen-theme");
+  if (saved) document.documentElement.setAttribute("data-theme", saved);
+  else document.documentElement.removeAttribute("data-theme");
+
+  const dark = effectiveTheme() === "dark";
+  themeToggle.querySelector(".theme-icon").textContent = dark ? "🌙" : "☀️";
+  themeToggle.title = dark ? "Switch to light theme" : "Switch to dark theme";
+}
+
+themeToggle.addEventListener("click", () => {
+  const next = effectiveTheme() === "dark" ? "light" : "dark";
+  localStorage.setItem("whatwhen-theme", next);
+  applyTheme();
 });
 
 // In-memory mirror of the server state. The DOM is rebuilt from this and the
@@ -273,5 +297,6 @@ async function load() {
 }
 
 applyLock();
+applyTheme();
 load();
 setInterval(tick, 1000);
