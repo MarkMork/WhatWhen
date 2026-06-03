@@ -4,6 +4,24 @@ const grid = document.getElementById("grid");
 const empty = document.getElementById("empty");
 const addForm = document.getElementById("add-form");
 const addInput = document.getElementById("add-input");
+const lockToggle = document.getElementById("lock-toggle");
+
+// When locked (the default), edit/delete and timestamp editing are hidden so the
+// everyday view stays clean. Preference is remembered in the browser.
+let unlocked = localStorage.getItem("whatwhen-unlocked") === "1";
+
+function applyLock() {
+  document.body.classList.toggle("unlocked", unlocked);
+  lockToggle.setAttribute("aria-pressed", String(unlocked));
+  lockToggle.querySelector(".lock-icon").textContent = unlocked ? "🔓" : "🔒";
+  lockToggle.querySelector(".lock-text").textContent = unlocked ? "Unlocked" : "Locked";
+}
+
+lockToggle.addEventListener("click", () => {
+  unlocked = !unlocked;
+  localStorage.setItem("whatwhen-unlocked", unlocked ? "1" : "0");
+  applyLock();
+});
 
 // In-memory mirror of the server state. The DOM is rebuilt from this and the
 // timers tick locally against each item's lastReset timestamp.
@@ -50,6 +68,14 @@ function fmtDate(iso) {
   });
 }
 
+// Convert an ISO timestamp to the local "YYYY-MM-DDTHH:MM" value a
+// datetime-local input expects.
+function toLocalInputValue(iso) {
+  const d = new Date(iso);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 function render() {
   empty.classList.toggle("hidden", items.length > 0);
 
@@ -80,8 +106,12 @@ function render() {
       timer.dataset.reset = item.lastReset;
 
       const sub = document.createElement("div");
-      sub.className = "card-sub";
+      sub.className = "card-sub editable";
       sub.textContent = `Last done ${fmtDate(item.lastReset)}`;
+      sub.title = "Edit when this was last done";
+      sub.addEventListener("click", () => {
+        if (unlocked) startEditTime(card, item);
+      });
 
       const reset = document.createElement("button");
       reset.className = "btn btn-reset";
@@ -155,6 +185,46 @@ function startEdit(card, item) {
   });
 }
 
+function startEditTime(card, item) {
+  const sub = card.querySelector(".card-sub");
+  const input = document.createElement("input");
+  input.type = "datetime-local";
+  input.className = "time-input";
+  input.value = toLocalInputValue(item.lastReset);
+  sub.replaceWith(input);
+  input.focus();
+
+  let done = false;
+  const commit = async () => {
+    if (done) return;
+    done = true;
+    if (input.value) {
+      const iso = new Date(input.value).toISOString();
+      if (iso !== new Date(item.lastReset).toISOString()) {
+        try {
+          const updated = await api(`/api/items/${item.id}`, {
+            method: "PATCH",
+            body: JSON.stringify({ lastReset: iso }),
+          });
+          Object.assign(item, updated);
+        } catch (e) {
+          alert("Could not update time: " + e.message);
+        }
+      }
+    }
+    render();
+  };
+
+  input.addEventListener("blur", commit);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") commit();
+    if (e.key === "Escape") {
+      done = true;
+      render();
+    }
+  });
+}
+
 async function resetItem(item) {
   try {
     const updated = await api(`/api/items/${item.id}/reset`, { method: "POST" });
@@ -202,5 +272,6 @@ async function load() {
   render();
 }
 
+applyLock();
 load();
 setInterval(tick, 1000);

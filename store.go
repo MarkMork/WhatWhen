@@ -93,8 +93,15 @@ func (s *Store) Add(label string) (*Item, error) {
 	return item, nil
 }
 
-// Edit changes an item's label.
-func (s *Store) Edit(id, label string) (*Item, error) {
+// ItemUpdate holds the fields that can be changed on an existing item. A nil
+// field is left unchanged.
+type ItemUpdate struct {
+	Label     *string
+	LastReset *time.Time
+}
+
+// Update applies the non-nil fields of u to the item with the given id.
+func (s *Store) Update(id string, u ItemUpdate) (*Item, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -102,7 +109,12 @@ func (s *Store) Edit(id, label string) (*Item, error) {
 	if item == nil {
 		return nil, ErrNotFound
 	}
-	item.Label = label
+	if u.Label != nil {
+		item.Label = *u.Label
+	}
+	if u.LastReset != nil {
+		item.LastReset = *u.LastReset
+	}
 	if err := s.persist(); err != nil {
 		return nil, err
 	}

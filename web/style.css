@@ -39,8 +39,36 @@ body {
 }
 
 .app-header {
+  position: relative;
   text-align: center;
   padding: 2.2rem 1rem 0.4rem;
+}
+
+.lock-toggle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: color 0.15s, border-color 0.15s;
+}
+.lock-toggle:hover { color: var(--text); }
+.lock-toggle .lock-icon { font-size: 0.95rem; line-height: 1; }
+
+body.unlocked .lock-toggle {
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 .app-header h1 {
@@ -135,7 +163,9 @@ main {
   word-break: break-word;
 }
 
-.card-menu { display: flex; gap: 0.25rem; flex-shrink: 0; }
+/* Management controls are hidden until the page is unlocked. */
+.card-menu { display: none; gap: 0.25rem; flex-shrink: 0; }
+body.unlocked .card-menu { display: flex; }
 
 .icon-btn {
   background: transparent;
@@ -162,6 +192,25 @@ main {
   font-size: 0.8rem;
   color: var(--text-muted);
   margin-top: -0.3rem;
+}
+
+/* When unlocked, the "Last done" line is editable. */
+body.unlocked .card-sub.editable {
+  cursor: pointer;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+body.unlocked .card-sub.editable:hover { color: var(--text); }
+
+.time-input {
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 0.2rem 0.4rem;
+  outline: none;
 }
 
 .btn-reset {

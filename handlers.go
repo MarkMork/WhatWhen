@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"net/http"
 	"strings"
+	"time"
 )
 
 //go:embed web
@@ -38,11 +39,42 @@ func registerRoutes(mux *http.ServeMux, store *Store) {
 	})
 
 	mux.HandleFunc("PATCH /api/items/{id}", func(w http.ResponseWriter, r *http.Request) {
-		label, ok := decodeLabel(w, r)
-		if !ok {
+		var body struct {
+			Label     *string `json:"label"`
+			LastReset *string `json:"lastReset"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			writeError(w, http.StatusBadRequest, errors.New("invalid JSON body"))
 			return
 		}
-		item, err := store.Edit(r.PathValue("id"), label)
+
+		var update ItemUpdate
+		if body.Label != nil {
+			label := strings.TrimSpace(*body.Label)
+			if label == "" {
+				writeError(w, http.StatusBadRequest, errors.New("label cannot be empty"))
+				return
+			}
+			if len(label) > maxLabelLen {
+				label = label[:maxLabelLen]
+			}
+			update.Label = &label
+		}
+		if body.LastReset != nil {
+			t, err := time.Parse(time.RFC3339, *body.LastReset)
+			if err != nil {
+				writeError(w, http.StatusBadRequest, errors.New("lastReset must be an RFC3339 timestamp"))
+				return
+			}
+			t = t.UTC()
+			update.LastReset = &t
+		}
+		if update.Label == nil && update.LastReset == nil {
+			writeError(w, http.StatusBadRequest, errors.New("nothing to update"))
+			return
+		}
+
+		item, err := store.Update(r.PathValue("id"), update)
 		if respondMaybeNotFound(w, err) {
 			return
 		}
