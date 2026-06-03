@@ -25,9 +25,19 @@ Docker Compose
 services:
   whatwhen:
     image: ghcr.io/markmork/whatwhen:latest
+    container_name: whatwhen
     restart: unless-stopped
     ports:
       - "8080:8080"
+    environment:
+      # Override the listen port or data file location if you like.
+      - PORT=8080
+      - DATA_FILE=/data/whatwhen.json
+    volumes:
+      - whatwhen-data:/data
+
+volumes:
+  whatwhen-data:
 ```
 
 Then open <http://localhost:8080>. Data is stored in the named volume `whatwhen-data`
