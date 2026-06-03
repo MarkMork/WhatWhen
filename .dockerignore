@@ -1,0 +1,8 @@
+.git
+.gitignore
+README.md
+*.md
+data/
+*.tmp
+whatwhen
+whatwhen.json

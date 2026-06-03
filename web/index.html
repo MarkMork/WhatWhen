@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#4f46e5" />
+  <title>WhatWhen</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>What<span>When</span></h1>
+    <p class="tagline">What you did &amp; when you last did it</p>
+  </header>
+
+  <main>
+    <form id="add-form" class="add-form" autocomplete="off">
+      <input
+        id="add-input"
+        type="text"
+        name="label"
+        maxlength="100"
+        placeholder="Add a task — e.g. Change the beds"
+        aria-label="New task label"
+        required
+      />
+      <button type="submit" class="btn btn-add">Add</button>
+    </form>
+
+    <section id="grid" class="grid" aria-live="polite"></section>
+
+    <p id="empty" class="empty hidden">
+      No tasks yet. Add one above to start tracking when you last did it.
+    </p>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

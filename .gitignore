@@ -1,0 +1,7 @@
+# compiled binary
+/whatwhen
+
+# local data files
+*.tmp
+data/
+whatwhen.json
