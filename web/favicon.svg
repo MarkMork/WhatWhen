@@ -1,0 +1,11 @@
+<svg width="32" height="32" viewBox="0 0 64 86" xmlns="http://www.w3.org/2000/svg" role="img">
+  <title>WhatWhen</title>
+  <!-- Top W -->
+  <path fill="#1e293b"
+    d="M0,0 L15,60 L32,20 L49,60 L64,0
+       L55,0 L49,42 L32,2 L15,42 L9,0 Z"/>
+  <!-- Bottom W -->
+  <path fill="#4f46e5"
+    d="M0,26 L15,86 L32,46 L49,86 L64,26
+       L55,26 L49,68 L32,28 L15,68 L9,26 Z"/>
+</svg>
